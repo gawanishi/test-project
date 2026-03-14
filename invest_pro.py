@@ -11,29 +11,34 @@ total_amount = 0               # 最終的な資産額
 total_invested = 0             # 自分で出した元本の合計
 monthly_rate = annual_rate / 12 # 月利に変換
 
+print("【年ごとの資産推移】")
+print("-" * 40)
+
 # --- シミュレーション開始 ---
 for month in range(1, total_years * 12 + 1):
-    # 現在が何年目かを計算
     current_year = (month - 1) // 12 + 1
     
-    # 積立額の判定（change_yearを境に金額を変える）
     if current_year <= change_year:
         monthly_deposit = initial_monthly
     else:
         monthly_deposit = later_monthly
     
-    # 資産額の計算：(今の資産 + 今月の積立) × 利息
     total_amount = (total_amount + monthly_deposit) * (1 + monthly_rate)
     total_invested += monthly_deposit
 
-# --- 税金と最終利益の計算 ---
-profit = total_amount - total_invested # 利益
-tax = profit * tax_rate                 # 税金
-final_amount = total_amount - tax       # 税引き後の手残り
+    # ★ここが新しい部分！：12ヶ月（1年）ごとに画面に表示する
+    if month % 12 == 0:
+        profit = total_amount - total_invested
+        print(f"{current_year:2}年目 | 元本: {total_invested:9,.0f}円 | 資産: {total_amount:9,.0f}円 | 利益: {profit:9,.0f}円")
 
-# --- 結果発表 ---
-print(f"【{total_years}年後のシミュレーション結果】")
-print(f"投資元本: {total_invested:,.0f}円")
+print("-" * 40)
+
+# --- 税金と最終利益の計算 ---
+final_profit = total_amount - total_invested
+tax = final_profit * tax_rate
+final_amount = total_amount - tax
+
+print(f"\n【最終結果】")
 print(f"税引き前資産: {total_amount:,.0f}円")
-print(f"税金（{tax_rate*100:.3f}%）: {tax:,.0f}円")
-print(f"最終受取額: {final_amount:,.0f}円")
+print(f"引かれる税金: {tax:,.0f}円")
+print(f"最終手取り額: {final_amount:,.0f}円")
