@@ -1,6 +1,7 @@
-import matplotlib.pyplot as plt  # グラフを描くための道具を読み込む
+import matplotlib.pyplot as plt
 
-# --- ユーザー入力 ---
+# --- ユーザー入力 (ここに追加) ---
+target_amount = int(input("目標金額を入力してください（円）: ")) # 新しい変数！
 initial_monthly = int(input("最初の毎月の積立額（円）: "))
 later_monthly = int(input("5年目以降の積立額（円）: "))
 total_years = int(input("運用期間（年）: "))
@@ -13,10 +14,9 @@ monthly_rate = annual_rate / 12
 total_amount = 0
 total_invested = 0
 
-# ★グラフ用のデータを貯める「リスト（箱）」を準備
-years_list = []      # 何年目か
-amounts_list = []    # その時の資産額
-invested_list = []   # その時の元本合計
+years_list = []
+amounts_list = []
+invested_list = []
 
 # --- シミュレーション開始 ---
 for month in range(1, total_years * 12 + 1):
@@ -30,29 +30,32 @@ for month in range(1, total_years * 12 + 1):
     total_amount = (total_amount + monthly_deposit) * (1 + monthly_rate)
     total_invested += monthly_deposit
 
-    # 1年（12ヶ月）ごとにデータをリストに追加する
     if month % 12 == 0:
-        years_list.append(current_year)     # 年数を貯める
-        amounts_list.append(total_amount)   # 資産を貯める
-        invested_list.append(total_invested) # 元本を貯める
+        years_list.append(current_year)
+        amounts_list.append(total_amount)
+        invested_list.append(total_invested)
 
-# --- グラフの作成 ---
-plt.figure(figsize=(10, 6)) # グラフのサイズを設定
+# --- 税金と最終利益の計算 ---
+final_profit = total_amount - total_invested
+tax = final_profit * 0.20315
+final_amount = total_amount - tax
 
-# 2本の線を引く（資産と元本）
-plt.plot(years_list, amounts_list, label="Total Assets", marker="o") 
-plt.plot(years_list, invested_list, label="Total Invested", linestyle="--")
+# --- 目標との比較計算 (ここが新しい！) ---
+difference = target_amount - final_amount # 引き算で差額を出す
 
-# グラフのラベルやタイトル
-plt.title(f"Investment Simulation ({annual_rate_percent}% Annual Rate)")
-plt.xlabel("Year")
-plt.ylabel("Amount (Yen)")
-plt.grid(True)     # 網掛けを表示
-plt.legend()      # 凡例（ラベルの説明）を表示
+# --- 結果発表 ---
+print("-" * 50)
+print(f"最終受取額: {final_amount:,.0f}円")
+print(f"目標金額  : {target_amount:,.0f}円")
 
-# グラフを「investment_graph.png」という名前の画像として保存
-plt.savefig("investment_graph.png")
-print("\nグラフを 'investment_graph.png' として保存しました！")
+if difference > 0:
+    # 目標に届かなかった場合
+    print(f"結果：目標まであと 【{difference:,.0f}円】 足りませんでした。")
+    print("積立額を増やすか、運用期間を延ばしてみましょう！")
+else:
+    # 目標を達成した場合（差額が0かマイナス）
+    print(f"結果：おめでとうございます！目標を 【{-difference:,.0f}円】 上回りました！")
+    print("素晴らしい計画ですね！")
+print("-" * 50)
 
-# 画面にグラフを表示する（VS Codeの設定によっては別ウィンドウが開きます）
-plt.show()
+# (グラフ作成コードはそのまま続く...)
